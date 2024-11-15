@@ -4,6 +4,7 @@ import (
 	"net/http"
 	"strconv"
 
+	"github.com/bsorawit1234/expense-tracker-backend/config"
 	"github.com/bsorawit1234/expense-tracker-backend/models"
 	"github.com/gin-gonic/gin"
 )
@@ -12,7 +13,7 @@ func GetExpenses(c *gin.Context) {
 	userID, _ := c.Get("userID")
 	var expenses []models.Expense
 
-	if err := models.DB.Where("user_id = ?", userID).Find(&expenses).Error; err != nil {
+	if err := config.DB.Where("user_id = ?", userID).Find(&expenses).Error; err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
@@ -30,7 +31,7 @@ func CreateExpense(c *gin.Context) {
 		return
 	}
 
-	if err := models.DB.Create(&expense).Error; err != nil {
+	if err := config.DB.Create(&expense).Error; err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
@@ -43,7 +44,7 @@ func UpdateExpense(c *gin.Context) {
 	userID, _ := c.Get("userID")
 	id, _ := strconv.Atoi(c.Param("id"))
 
-	if err := models.DB.Where("id = ? AND user_id ?", id, userID).First(&expense).Error; err != nil {
+	if err := config.DB.Where("id = ? AND user_id ?", id, userID).First(&expense).Error; err != nil {
 		c.JSON(http.StatusNotFound, gin.H{"error": "Expense not found"})
 		return
 	}
@@ -53,7 +54,7 @@ func UpdateExpense(c *gin.Context) {
 		return
 	}
 
-	models.DB.save(&expense)
+	config.DB.Save(&expense)
 	c.JSON(http.StatusOK, expense)
 }
 
@@ -62,11 +63,11 @@ func DeleteExpense(c *gin.Context) {
 	userID, _ := c.Get("userID")
 	id, _ := strconv.Atoi(c.Param("id"))
 
-	if err := models.DB.Where("id = ? AND user_id = ?", id, userID).First(&expense).Error; err != nil {
+	if err := config.DB.Where("id = ? AND user_id = ?", id, userID).First(&expense).Error; err != nil {
 		c.JSON(http.StatusNotFound, gin.H{"error": "Expense not found"})
 		return
 	}
 
-	models.DB.Delete(&expense)
+	config.DB.Delete(&expense)
 	c.JSON(http.StatusOK, gin.H{"message": "Expenese deleted"})
 }

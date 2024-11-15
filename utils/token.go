@@ -22,12 +22,13 @@ func GenerateJWT(userID uint) (string, error) {
 		},
 	}
 
-	token := jwt.NewWithClaims(jwt.SigningMethodES256, claims)
+	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
 	return token.SignedString(jwtKey)
 }
 
 func ValidateToken(signedToken string) (*JWTClaim, error) {
-	token, err := jwt.ParseWithClaims(signedToken,
+	token, err := jwt.ParseWithClaims(
+		signedToken,
 		&JWTClaim{},
 		func(token *jwt.Token) (interface{}, error) {
 			return jwtKey, nil
